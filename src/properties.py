@@ -59,7 +59,7 @@ def my_kinetic_energy(vel, mass):
     return k
 
 
-def my_potential_energy(rij):
+def my_potential_energy(rij, rc):
     """ Calculate total potential energy.
 
     Args:
@@ -67,16 +67,18 @@ def my_potential_energy(rij):
     Return:
       float: total potential energy
     """
+    vshift = 4 * rc ** (-6) * (rc ** (-6) - 1)
     potential = 0.0
     for i in range(len(rij)):
         for j in range(i + 1, len(rij[0])):
             r = rij[i][j]
-            potential += 4 * r ** (-6) * (r ** (-6) - 1)
+            if r <= rc:
+                potential += 4 * r ** (-6) * (r ** (-6) - 1) - vshift
 
     return potential
 
 
-def my_force_on(i, pos, lbox):
+def my_force_on(i, pos, lbox, rc):
     """
     Compute force on atom i
 
@@ -94,7 +96,8 @@ def my_force_on(i, pos, lbox):
             continue
         r_ij = my_disp_in_box(cur - atom, lbox)
         r = my_distance(r_ij)
-        Force += 24 * r ** (-8) * (2 * r ** (-6) - 1) * r_ij
+        if r <= rc:
+            Force += 24 * r ** (-8) * (2 * r ** (-6) - 1) * r_ij
     return Force
 
 

@@ -28,6 +28,13 @@ def plot_E(E):
     plt.xlabel('Steps')
     plt.plot(E)
 
+def plot_pE(pE):
+    plt.figure()
+    plt.title('Total Potential Energy')
+    plt.ylabel('Energy')
+    plt.xlabel('Steps')
+    plt.plot(pE)
+
 def plot_T(T):
     plt.figure()
     plt.title('Temperature')

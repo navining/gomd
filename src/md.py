@@ -1,9 +1,9 @@
 import matplotlib.pyplot as plt
 import random as rd
 
-from source import display, initial as init, verlet as verl
-from source.properties import *
-from source.input import *
+from src import display, initial as init, verlet as verl
+from src.properties import *
+from src.input import *
 
 
 # Main Loop.
@@ -23,6 +23,7 @@ def simulate():
     A = np.zeros((N, 3))
 
     E = np.zeros(steps)
+    pE = np.zeros(steps)
     T = np.zeros(steps)
     mv = np.zeros((steps,3))
     print("steps\ttemperature\tkinetic\tpotential\tenergy\t")
@@ -46,13 +47,14 @@ def simulate():
         all_vec[t] = V
 
         ## calculate potential energy contribution
-        p = my_potential_energy(drij)
+        p = my_potential_energy(drij, rc)
 
         ## calculate total energy
         E[t] = k + p
+        pE[t] = p
 
         ## calculate forces; should be a function that returns an N x 3 array
-        F = np.array([my_force_on(i, R, L) for i in range(N)])
+        F = np.array([my_force_on(i, R, L, rc) for i in range(N)])
         A = F / M
 
         # -----------------------Anderson Thermostat----------------------
@@ -71,7 +73,7 @@ def simulate():
         nR = my_pos_in_box(nR, L)  ## from PrairieLearn HW
 
         ## calculate forces with new positions nR
-        nF = np.array([my_force_on(i, nR, L) for i in range(N)])
+        nF = np.array([my_force_on(i, nR, L, rc) for i in range(N)])
         nA = nF / M
         nV = verl.VerletNextV(V, A, nA, h)
 
@@ -100,12 +102,13 @@ def simulate():
     print("Diffusion constant: " + str(D))
 
     # -----------------------------Display---------------------------------
-    display.plot_E(E)
-    display.plot_T(T)
-    display.plot_momentum(mv)
+    #display.plot_E(E)
+    display.plot_pE(pE)
+    #display.plot_T(T)
+    #display.plot_momentum(mv)
     display.plot_gr(gr, nbins, L)
     display.plot_sk(kvecs, sk)
-    display.plot_vv(vacf, t0, steps)
+    #display.plot_vv(vacf, t0, steps)
     plt.show()
 
     return E
